@@ -1,0 +1,4 @@
+IID	metabolite1	metabolite2	metabolite1	
+sample_001	-1.45	0.82	0.98	
+sample_002	0.75	-1.23	1.04	
+sample_003	-2.23	1.42	2.21	
