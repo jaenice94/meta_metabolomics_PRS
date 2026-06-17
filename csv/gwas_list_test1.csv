@@ -1,0 +1,7 @@
+#trait: leave trait name unchanged for harmonisation;;
+#sst_file: please supply the absolute file path of your summary stats under sst_path matching the trait;;
+#n_gwas: total GWAS sample size (adjust to Leave-one-out GWAS sample sizes);;
+#;;
+phenotype;sst_file;n_gwas
+bip4;/dss/dssfs03/pr92to/pr92to-dss-0006/PRScs/sum_stats/bip4_cs.txt;150000
+ptsd;/dss/dssfs03/pr92to/pr92to-dss-0006/PRScs/sum_stats/PTSD_2024_cs.txt;641000
