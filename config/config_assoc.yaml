@@ -1,0 +1,20 @@
+#general parameters 
+general:
+  ld_ref_dir: "/dss/dssfs03/pr92to/pr92to-dss-0006/PRScs/PRScs/ldblk_1kg_eur" #directory of ld reference, please use ldblk_1kg_eur
+  chromosomes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22] #please leave unchanged
+  bim: "/dss/dssfs03/pr92to/pr92to-dss-0006/PRScs/bims/PsyCourse_MimicSS" #location of .bim (list of variants) without .bim extension
+  genotype: "PsyCourse_MimicSS" #cohort
+  list_file: "PsyCourse_MimicSS_dosage_list.txt" #list containing paths to dosage files - see example
+  fam: "/dss/dssfs03/pr92to/pr92to-dss-0006/data/PsyCourse_GSA/PsyCourse_MimicSS_imputed_michigan_2022/plink_dosage_maf01_rsID/aux_files/PsyCourse_MimicSS.fam" #location of sample file 
+  output_dir: "/dss/dsshome1/0A/di54jot/meta_metabolomics/test" #optional; default is results
+
+association_analysis:
+  covariates: ["sex", "age", "time", "sexintage", "ageintage", "bmi", "C1", "C2", "C3", "C4"] #covariates to include in the model - need to agree on a set 
+  metadata: "/dss/dssfs03/pr92to/pr92to-dss-0006/Eva_lipidomics/lipidQTL/data_prep_GSA/covar_file_ALL_GWAS.txt" #file with meta-data including all relevant covariates 
+  metabolites: "/dss/dsshome1/0A/di54jot/meta_metabolomics/prscs/metabolites_cleaned.txt" #make sure here to already filter to metabolites to include (no non-annotated, no fasting lipids), ideally the metabolite is in a harmonised naming already
+
+  #might be able to make this more straightforward based on what is done in the previous lipid-QTL analysis
+
+#specify list of GWAS to run
+base:
+  sep: ";" #don't change, separator of gwas-list
