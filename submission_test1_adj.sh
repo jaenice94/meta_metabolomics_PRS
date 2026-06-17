@@ -4,9 +4,10 @@
 #SBATCH --clusters=serial
 #SBATCH --partition=serial_std
 #SBATCH --time=24:00:00
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 
+#run prscs in batches of 8 chr at once
 
 cd /dss/dsshome1/0A/di54jot/meta_metabolomics/prscs
 mkdir -p logs
@@ -43,7 +44,7 @@ snakemake \
   --use-conda \
   --conda-frontend conda \
   --latency-wait 60 \
-  --cores 1 \
+  --cores 8 \ 
   --keep-incomplete \
   --printshellcmds \
   --rerun-incomplete
