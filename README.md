@@ -1,8 +1,8 @@
-#PRS-Metabolite Association Pipeline
+# PRS-Metabolite Association Pipeline
 
 A snakemake wrapped pipeline to generate polygenic risk scores (PRS) using GWAS and test associations between PRS and metabolite traits. PRS are computed using PRS-CS and scored with PLINK1.9. Association models fit lipid ~ PRS + covariates (PRS-model) and lipid ~ covariates (baseline-model), reporting effect sizes (BETA), p-values and incremental R2 (PRS-model - baseline model). 
 
-##Software requirements:
+## Software requirements:
 - snakemake 
 - prs-cs
 - plink1.9
@@ -16,7 +16,7 @@ cd prscs
 git clone https://github.com/getian107/PRScs.git
 ```
 
-##Data requirements:
+## Data requirements:
 - Formatted GWAS study (provide specifics) not containing the genotype to be tested (leave-one-out if necessary).
 - LD reference (use ldblk_1kg_eur) - can be derived from XX. 
 - Genotype data (you will need a .bim containing all relevant SNPs, .fam containing relevant samples, a list of .dosage files - specified in dosage_list.txt). The genotype data should be QC'd. Variants with MAF etc removed. 
@@ -28,7 +28,7 @@ Before running the pipeline, edit the dosage_list.txt, config.yaml and sampleshe
 - gwas_list.csv please provide here the dir_path of the formatted GWAS and the N of the leave-one-out GWAS if applicable. 
 - config.yaml please provide your directory paths for the necessary inputs
 
-##Running the pipeline
+## Running the pipeline
 
 Step 1 - set up environment 
 ```bash
@@ -74,7 +74,7 @@ snakemake \
   --rerun-incomplete \
   --cluster "sbatch --clusters=serial --partition=serial_std --time={resources.runtime} --mem={resources.mem_mb}M --output=logs/{rule}.%j.log"
 ```
-##Structure of repository
+## Structure of repository
 ```
 ├──workflow/snakemake_assoc.smk #snakemake script
 │  └──envs #enviroment.yamls required
