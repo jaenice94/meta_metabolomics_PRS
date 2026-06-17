@@ -1,0 +1,9 @@
+name: prscs
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - numpy
+  - scipy
+  - h5py
