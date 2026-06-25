@@ -10,8 +10,9 @@ A snakemake wrapped pipeline to generate polygenic risk scores (PRS) using GWAS 
 All necessary software can be obtained as follows: 
 
 Clone this git and the original PRScs.git
+
 ```bash
-git clone https://github.com/jaenice94/prscs.git #modify!! 
+git clone https://github.com/jaenice94/meta_metabolomics_PRS.git
 cd prscs
 git clone https://github.com/getian107/PRScs.git
 ```
