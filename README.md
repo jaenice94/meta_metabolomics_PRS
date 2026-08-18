@@ -19,8 +19,8 @@ git clone https://github.com/getian107/PRScs.git
 
 ## Data requirements:
 - Formatted GWAS study (provide specifics) not containing the genotype to be tested (leave-one-out if necessary).
-- LD reference (use ldblk_1kg_eur) - can be derived from XX. 
-- Genotype data (you will need a .bim containing all relevant SNPs, .fam containing relevant samples, a list of .dosage files - specified in dosage_list.txt). The genotype data should be QC'd. Variants with MAF etc removed. 
+- LD reference (use ldblk_1kg_eur) - see https://github.com/getian107/PRScs.git for download links. The LD reference should match the population ancestry with largest sample size in GWAS sumstats.  
+- Genotype data (you will need a .bim containing all relevant SNPs, .fam containing relevant samples, a list of .dosage files - specified in dosage_list.txt). The genotype data should be QC'd. Variants with MAF etc removed. (ADD SUPPORT FOR OTHER DATAFORMATS!)
 - Normalised metabolite data (IID Peak1 Peak2 Peak3 ... ) measured in same individuals as the genotype. Please remove non-annotated lipids, fasting lipids and outliers. 
 - Metadata containing information on covariates of same individuals as genotype and metabolites 
 
