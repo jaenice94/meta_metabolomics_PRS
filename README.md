@@ -13,7 +13,7 @@ Clone this git and the original PRScs.git
 
 ```bash
 git clone https://github.com/jaenice94/meta_metabolomics_PRS.git
-cd prscs
+cd meta_metabolomics_PRS
 git clone https://github.com/getian107/PRScs.git
 ```
 
