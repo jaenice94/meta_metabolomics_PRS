@@ -36,8 +36,8 @@ Step 1 - set up environment
 conda env create -f workflow/envs/snakemake7.yaml
 conda activate snakemake7
 ```
-Step 2 - test out the snakemake.smk and your inputs in a dry run 
 
+Step 2 - test out the snakemake.smk and your inputs in a dry run 
 ```bash
 cd prscs 
 
@@ -46,9 +46,15 @@ SNAKEFILE="${SNAKEFILE:-workflow/snakeflow_assoc.smk}" #keep
 CONFIGFILE="${CONFIGFILE:-config/config_assoc.yaml}" #fill config with your paths
 
 snakemake -np -s "$SNAKEFILE" --configfile "$CONFIGFILE" --config "samplesheet=$SAMPLESHEET" 
+```
+
+If a previous Snakemake run was interrupted and the working directory is locked, unlock it with:
+```bash
+snakemake -s "$SNAKEFILE" --configfile "$CONFIGFILE" --config "samplesheet=$SAMPLESHEET" --unlock --cores 1
+```
 
 Step 3A - submit pipeline as script (modify the #SBATCH header to fot your cluster's requirements on job submissions)
-
+```bash
 sbatch submit_assoc.sh 
 ```
 
