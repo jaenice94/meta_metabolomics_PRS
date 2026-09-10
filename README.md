@@ -3,8 +3,8 @@
 A snakemake workflow to generate polygenic risk scores (PRS) from GWAS summary statistics using PRS-CS, score PRS in a target cohort using PLINK2 and test associations between the PRS and metabolic traits. 
 
 # Pipeline workflow: 
-
-Pipeline overview figure generated with ChatGPT
+<img width="1400" height="788" alt="Image" src="https://github.com/user-attachments/assets/3a8f5eb7-6bbc-45f1-bbbe-7400293d8b1c" />
+Pipeline overview figure generated with ChatGPT.
 
 ## 1. Set-up:
 
