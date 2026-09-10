@@ -1,0 +1,14 @@
+#phenotype: leave trait name unchanged for harmonisation with other cohorts;;
+#sst_file: please supply the absolute file path of your summary stats under sst_path matching the trait;;
+#n_gwas: total GWAS sample size (adjust to Leave-one-out GWAS sample sizes);;
+#snp_col: name of the SNP identifier column in the summary statistics (e.g. SNP, rsid);;
+#effect_allele_col: name of the effect allele column; this allele will be renamed to A1 for PRS-CS;;
+#other_allele_col: name of the non-effect/other allele column; this allele will be renamed to A2 for PRS-CS;;
+#effect_col: name of the effect-size column in the summary statistics;;
+#effect_type: type of effect size provided in effect_col; must be BETA or OR (BETA preferred);;
+#stat_col: name of the statistical uncertainty/significance column in the summary statistics;;
+#stat_type: type of statistic provided in stat_col; must be SE or P (SE preferred);;
+#;;
+phenotype;sst_file;n_gwas;snp_col;effect_allele_col;other_allele_col;effect_col;effect_type;stat_col;stat_type
+bip4;path/bip4_cs.txt;150000;SNP;A1;A2;OR;OR;P;P
+ptsd;path/PTSD_2024_cs.txt;641000;SNP;A1;A2;BETA;BETA;P;P
