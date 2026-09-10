@@ -51,13 +51,35 @@ Note: The LD reference is used internally by PRS-CS and to restrict and harmonis
 ### Genotype data: 
 The pipeline currently supports PLINK1 (.bed,.bim,.fam) and PLINK2 (.pgen, .pvar, .psam) files that are chromosome-split or genome-wide. For PLINK2 both best-guess and dosage information genotypes are supported. Target cohort genotype data must have undergone appropriate QC post-imputation. The sample IID must match to sample IID in metabolite and metadata files.
 
+| Format | Supported Layout | Example files | Prefix | Format |
+|--------|--------|--------|--------|--------|
+| PLINK1 | chromosome-split | chr1.bim/bed/fam, chr2.bim/bed/fam, ... | dir/chr{chr} | best-guess |
+| PLINK2 | chromosome-split | chr1.pvar/pgen/psam, chr2.pvar/pgen/psam, ... | dir/chr{chr} | best-guess / dosage |
+| PLINK1 | genome-wide | cohort.bim/bed/fam | dir/cohort | best-guess |
+| PLINK2 | genome-wide | cohort.pvar/pgen/psam | dir/cohort | best-guess / dosage |
+
 ### Normalised metabolite data: 
 For meta-metabolomics analayis, use the normalisd metabolite output.
+
+Example:
+| IID | metabolite_1 | metabolite_2 | metabolite_3 |
+|--------|--------|--------|--------|
+| PS_1 | NA | 1 | 0.5 |
+| PS_2 | 1 | 2 | 1 |
+| PS_3 | 0.5 | 1 | 0.5 |
+| PS_4 | 2 | 0.5 | NA | 
 
 Note: Must contain IID and allows also a FID column. All other columns are treated as metabolite traits and will enter the association analysis. Ensure missing values are encoded as NA. 
 
 ### Metadata: 
 Metadata file contains IID and all covariates to be used in the PRS-association model, specified in config/config_cohort.yaml.
+
+| IID | sex | bmi | age |
+|--------|--------|--------|--------|
+| PS_1 | 2 | 19.2 | 35 |
+| PS_2 | 1 | 25.6 | 40 |
+| PS_3 | 1 | 23.1 | 19 |
+| PS_4 | 2 | NA | 88 | 
 
 Note: Sample IID must correspond to IID in genotype and metabolite files. Ensure missing values are encoded as NA. 
   
@@ -66,6 +88,12 @@ Note: Sample IID must correspond to IID in genotype and metabolite files. Ensure
 ### GWAS samplesheet:
 
 csv/gwas_list.csv is a ;-separated file that contains per row one GWAS phenotype for which a PRS will be calculated. See csv/gwas_list.csv for example and column input information. 
+
+| phenotype | sst_file | n_gwas | snp_col | effect_allele_col | other_allele_col | effect_col | effect_type | stat_col | stat_type |
+|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+| bip4 | ~/bipolar_gwas.txt | 150000 | SNP | A1 | A2 | OR | OR | P | P |
+| ptsd | ~/ptsd_gwas.txt | 641000 | SNP | A1 | A2 | BETA | BETA | P | P |
+
 
 ### Cohort configuration:
 
@@ -146,7 +174,7 @@ Submit from within repository directory with:
 sbatch submit_snakemake.sh
 ```
 
-### B) Run within a tmux session (not extensively tested): 
+### B) Have Snakemake submit from within a tmux session, support not added yet. 
 
 
 ### Unlocking an interrupted Snakemake run: 
