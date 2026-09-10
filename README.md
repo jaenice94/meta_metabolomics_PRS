@@ -117,13 +117,32 @@ conda activate snakemake7
 
 SAMPLESHEET="csv/gwas_list.csv"
 CONFIGFILE="config/config_cohort.yaml"
-
 SNAKEFILE="workflow/snakemake_harmonised.smk"
 
 snakemake -np -s "$SNAKEFILE" --configfile "$CONFIGFILE" --config "samplesheet=$SAMPLESHEET" 
 ```
 
-## 5. Run the pipeline. 
+## 5. Install all required packages for workflow through snakemake
+
+Sometimes internet access from compute-nodes is limited, so it's safer to install the packages first
+```{bash}
+SAMPLESHEET="csv/gwas_list.csv"
+CONFIGFILE="config/config_cohort.yaml"
+SNAKEFILE="workflow/snakemake_harmonised.smk"
+
+conda activate snakemake7
+
+snakemake \
+    -s "$SNAKEFILE" \
+    --configfile "$CONFIGFILE" \
+    --config "samplesheet=$SAMPLESHEET" \
+    --use-conda \
+    --conda-frontend conda \
+    --conda-create-envs-only \
+    --cores 1
+```
+
+## 6. Run the pipeline. 
 
 ### A) with job submission (here an example script for SLURM): 
 ```{bash}
