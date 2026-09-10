@@ -1,64 +1,159 @@
 # PRS-Metabolite Association Pipeline
 
-A snakemake wrapped pipeline to generate polygenic risk scores (PRS) using GWAS and test associations between PRS and metabolite traits. PRS are computed using PRS-CS and scored with PLINK1.9. Association models fit lipid ~ PRS + covariates (PRS-model) and lipid ~ covariates (baseline-model), reporting effect sizes (BETA), p-values and incremental R2 (PRS-model - baseline model). 
+A snakemake workflow to generate polygenic risk scores (PRS) from GWAS summary statistics using PRS-CS, score PRS in a target cohort using PLINK2 and test associations between the PRS and metabolic traits. 
 
-## Software requirements:
-- snakemake 
-- prs-cs
-- plink1.9
+# Pipeline workflow: 
 
-All necessary software can be obtained as follows: 
+Pipeline overview figure generated with ChatGPT
 
-Clone this git and the original PRScs.git
+## 1. Set-up:
 
+# Software requirements:
+The workflow uses, but is installed as part of snakemake and the set-up. Please ensure you have conda/mamba environments installed. All other packages are installed through workflow/env containing yamls as part of the snakemake process. 
+```
+- Snakemake 7.3.7 
+- PRS-CS
+- PLINK2
+- Python 3.10
+- R
+- conda
+```
+Clone Github Repositories:
+
+clone this repository and inside it the original PRS-CS repository:
 ```bash
 git clone https://github.com/jaenice94/meta_metabolomics_PRS.git
 cd meta_metabolomics_PRS
 git clone https://github.com/getian107/PRScs.git
 ```
-
-## Data requirements:
-- Formatted GWAS study (provide specifics) not containing the genotype to be tested (leave-one-out if necessary).
-- LD reference (use ldblk_1kg_eur) - see https://github.com/getian107/PRScs.git for download links. The LD reference should match the population ancestry with largest sample size in GWAS sumstats.  
-- Genotype data (you will need a .bim containing all relevant SNPs, .fam containing relevant samples, a list of .dosage files - specified in dosage_list.txt). The genotype data should be QC'd. Variants with MAF etc removed. (ADD SUPPORT FOR OTHER DATAFORMATS!)
-- Normalised metabolite data (IID Peak1 Peak2 Peak3 ... ) measured in same individuals as the genotype. Please remove non-annotated lipids, fasting lipids and outliers. 
-- Metadata containing information on covariates of same individuals as genotype and metabolites 
-
-Before running the pipeline, edit the dosage_list.txt, config.yaml and samplesheet with your cohort specific information. 
-- dosage_list.txt contains a list of paths to genotype dosage files *.dosage.gz from processing with plink19 
-- gwas_list.csv please provide here the dir_path of the formatted GWAS and the N of the leave-one-out GWAS if applicable. 
-- config.yaml please provide your directory paths for the necessary inputs
-
-## Running the pipeline
-
-Step 1 - set up environment 
+create Snakemake environment: 
 ```bash
 conda env create -f workflow/envs/snakemake7.yaml
 conda activate snakemake7
 ```
 
-Step 2 - test out the snakemake.smk and your inputs in a dry run 
-```bash
-cd prscs 
+# Data requirements:
 
-SAMPLESHEET="csv/gwas_list_test1.csv"
-SNAKEFILE="${SNAKEFILE:-workflow/snakeflow_assoc.smk}" #keep
-CONFIGFILE="${CONFIGFILE:-config/config_assoc.yaml}" #fill config with your paths
+- GWAS summary statistics: each GWAS must contain SNP identifier, effect allele, other allele, effect estimate (BETA or OR) and either standard error (SE) or p-value (P). If available BETA + SE are preferred. The original column names can be specified in csv/gwas_list.csv, the workflow then extracts and renames columns for PRS-CS.
+
+Note: avoid sample overlap between GWAS and target cohort. For cohorts contributing to the original GWAS/meta-analysis, use leave-one-cohort-out GWAS summary statistics and specify GWAS sample size in csv/gwas_list.csv. 
+
+- LD reference: Download the appropriate PRS-CS LD reference (see https://github.com/getian107/PRScs.git for download links) - use ldblk_1kg_eur for PGC meta-metabolomics analysis unless otherwise specified.
+
+Note: The LD reference is used internally by PRS-CS and to restrict and harmonise cohort variants to the HapMap3 SNP representation used by PRS-CS. Matching is done by rsID, chromosome and allele and should therefore work for both genotypes in GRCh37 and GRCh38. 
+
+- Genotype data: The pipeline currently supports PLINK1 (.bed,.bim,.fam) and PLINK2 (.pgen, .pvar, .psam) files that are chromosome-split or genome-wide. For PLINK2 both best-guess and dosage information genotypes are supported. Target cohort genotype data must have undergone appropriate QC post-imputation. The sample IID must match to sample IID in metabolite and metadata files.
+
+- Normalised metabolite data: For meta-metabolomics analayis, use the normalisd metabolite output.
+
+Note: Must contain IID and allows also a FID column. All other columns are treated as metabolite traits and will enter the association analysis. Ensure missing values are encoded as NA. 
+
+- Metadata: Metadata file contains IID and all covariates to be used in the PRS-association model, specified in config/config_cohort.yaml.
+
+Note: Sample IID must correspond to IID in genotype and metabolite files. Ensure missing values are encoded as NA. 
+  
+## 2. Configure pipeline files: 
+
+# GWAS samplesheet:
+
+csv/gwas_list.csv is a ;-separated file that contains per row one GWAS phenotype for which a PRS will be calculated. See csv/gwas_list.csv for example and column input information. 
+
+# Cohort configuration:
+
+config/config_cohort.yaml contains cohort and analysis-specific configurations. Please update file to include your cohort-specific inputs. 
+
+## 3. Test configurations with dry-run: 
+
+From within repository directory:
+```{bash}
+
+cd prscs
+
+#create log directory
+mkdir -p logs
+
+conda activate snakemake7
+
+################################################
+# Define sample sheet, config file and snakemake files to use 
+################################################
+
+SAMPLESHEET="csv/gwas_list.csv"
+CONFIGFILE="config/config_cohort.yaml"
+
+SNAKEFILE="workflow/snakemake_harmonised.smk"
 
 snakemake -np -s "$SNAKEFILE" --configfile "$CONFIGFILE" --config "samplesheet=$SAMPLESHEET" 
 ```
 
-If a previous Snakemake run was interrupted and the working directory is locked, unlock it with:
-```bash
+## 4. Run the pipeline. 
+
+# A) with job submission (here an example script for SLURM): 
+```{bash}
+#!/bin/bash
+#SBATCH --job-name=PRScs
+#SBATCH --output=logs/PRScs.%j.log
+#SBATCH --clusters=serial
+#SBATCH --partition=serial_std
+#SBATCH --time=16:00:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=32G
+
+################################################
+# Define sample sheet, config file and snakemake files to use 
+################################################
+
+SAMPLESHEET="csv/gwas_list.csv" #updated with your paths
+CONFIGFILE="config/config_cohort.yaml" #updated with your paths
+
+SNAKEFILE="workflow/snakemake_harmonised.smk" #keep
+
+if [[ ! -f "$SAMPLESHEET" ]]; then
+  echo "ERROR: Samplesheet does not exist: $SAMPLESHEET"
+  exit 1
+fi
+
+echo "$SAMPLESHEET"
+echo "$SNAKEFILE"
+echo "$CONFIGFILE"
+
+module load miniforge3
+conda activate snakemake7
+
+snakemake \
+  -s "$SNAKEFILE" \
+  --configfile "$CONFIGFILE" \
+  --config "samplesheet=$SAMPLESHEET" \
+  --use-conda \
+  --conda-frontend conda \
+  --latency-wait 60 \
+  --cores 8 \
+  --keep-incomplete \
+  --printshellcmds \
+  --rerun-incomplete
+```
+Submit from within repository directory with: 
+```{bash}
+sbatch submit_snakemake.sh
+```
+
+# B) Run within a tmux session (not extensively tested): 
+
+
+# Unlocking an interrupted Snakemake run: 
+
+If the previous snakemake run was interrupted, Snakemake will report that the working directory is locked. Unlock it with: 
+```{bash}
+SAMPLESHEET="csv/gwas_list.csv" 
+CONFIGFILE="config/config_cohort.yaml" 
+SNAKEFILE="workflow/snakemake_harmonised.smk" 
+
 snakemake -s "$SNAKEFILE" --configfile "$CONFIGFILE" --config "samplesheet=$SAMPLESHEET" --unlock --cores 1
 ```
 
-Step 3A - submit pipeline as script (modify the #SBATCH header to fot your cluster's requirements on job submissions)
-```bash
-sbatch submit_assoc.sh 
-```
 
-or 
+
+
 
 Step 3B - run from within tmux session (not tested; only from login node) - this is for slurm on LRZ; modify to fit your HPC requirements
 ```bash
@@ -81,15 +176,27 @@ snakemake \
   --rerun-incomplete \
   --cluster "sbatch --clusters=serial --partition=serial_std --time={resources.runtime} --mem={resources.mem_mb}M --output=logs/{rule}.%j.log"
 ```
-## Structure of repository
+
+## Repository structure
 ```
-├──workflow/snakemake_assoc.smk #snakemake script
+├──workflow/snakemake_harmonised.smk #snakemake pipeline
 │  └──envs #enviroment.yamls required
-│  └──scripts/prs_metabolite_associations.R #contains necessary R-scripts
+│        └──prscs.yaml
+│        └──r_base.yaml
+│        └──plink.yaml
+│        └──snakemake7.yaml
+│  └──scripts #contains necessary R-scripts
+│        └──format_GWAS.R
+│        └──harmonise_bim_hm3.R
+│        └──sum_scores_p12.R
+│        └──prs_metabolite_associations_p12.R
 ├──PRScs/ #PRScs scripts cloned from https://github.com/getian107/PRScs
-├──config/config_assoc.yaml #config file  - please enter your specifics
-├──csv/gwas_list.csv #sheet for GWAS to run - please update your specifics
-├──dosage_list.txt #paths to per-chromosome genotype dosage files - please update your specifics
-├──results #default output directory for association results
-└──submit_assoc.sh #SLURM submission script - please update to match your HPC
+│        └──PRScs.py
+├──config #config files
+│        └──config_cohort.yaml #update to your cohort-specifics 
+├──csv #samplesheet for GWAS to process
+│        └──gwas_list.csv #update to your specifics 
+└──submit_snakemake.sh #example of submission script for SLURM
+└──FADS_variants_GRCh37.txt #FADS variants to exclude
+└──exclude_variants.sh #example to derive variant to exclude
 ```
