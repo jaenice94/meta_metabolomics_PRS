@@ -103,9 +103,6 @@ config/config_cohort.yaml contains cohort and analysis-specific configurations. 
 
 From within repository directory:
 ```{bash}
-
-cd prscs
-
 #create log directory
 mkdir -p logs
 
