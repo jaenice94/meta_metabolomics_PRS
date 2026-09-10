@@ -1,0 +1,36 @@
+#general parameters 
+general:
+  ld_ref_dir: "ldblk_1kg_eur" #directory of ld reference, please use ldblk_1kg_eur for meta-analysis
+
+  #genotype information/file locations
+  cohort: "PsyCourse_MimicSS" #cohort identifier
+  genotype_format: "plink2" #"plink1" / "plink2" - currently only plink1 files in bgen/bim/fam format or plink2 files in pgen/pvar/psam format are supported
+  genotype_layout: "chromosome_split" #"chromosome_split" / "genomewide" - currently split by chromosome, or genome-wide combined plink1/plink2 files are supported
+
+  genotype_prefix: "genotype_dir/chr{chr}_maf0.01" #contains directory + prefix and in case of chromosome split use {chr} specifies chr number, e.g. "genotype_dir/chr{chr}", with no file-ending
+
+  gwas_dir: "gwas_formatted" #specify the directory where to place the prscs-formatted GWAS
+  output_dir: "output_dir" #specify directory where to write outputs; default is prscs/results
+
+  chromosomes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22] #leave unchanged for meta-analysis
+
+
+#if true, it will construct weights and score both with and without excluded region. 
+region_exclusion:
+  exclude: true
+  locus: "FADS" 
+  variants_to_exclude: "FADS_variants_GRCh37.txt" #defined as chr11:61,293,499–61,854,782 in GRCh37
+  #to exclude variants in other regions - see exclude_variants.sh 
+
+
+association_analysis:
+  covariate_name: "base" #if running multiple covariate models, specify the name of the covariate model used
+  covariates: ["sex","age","bmi","time", "sexintage", "ageintage","C1","C2","C3","C4"] #covariates to include in the model - need to agree on a set 
+  metadata: "path/metadata.txt" #file with meta-data including all relevant covariates. please ensure missing values are encoded as NA 
+  metabolites: "path/cohort_platform_normalised_metabolites.tsv" #normalised output from Metabolomics_PCG/associational_model.R
+
+#for GWAS processing - leave unchanged. 
+base:
+  sep: ";" #don't change, separator of gwas-list
+
+
