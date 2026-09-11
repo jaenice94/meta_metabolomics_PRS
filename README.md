@@ -171,6 +171,7 @@ echo "$SNAKEFILE"
 echo "$CONFIGFILE"
 
 module load miniforge3
+source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate snakemake7
 
 snakemake \
@@ -205,17 +206,19 @@ snakemake -s "$SNAKEFILE" --configfile "$CONFIGFILE" --config "samplesheet=$SAMP
 ```
 ## Repository structure
 ```
-├──workflow/snakemake_harmonised.smk #snakemake pipeline
+meta_metabolomics_PRS
+├──workflow
+│  └──snakemake_harmonised.smk #snakemake pipeline which contains all scripts and rules
 │  └──envs #enviroment.yamls required
 │        └──prscs.yaml
 │        └──r_base.yaml
 │        └──plink.yaml
 │        └──snakemake7.yaml
 │  └──scripts #contains necessary R-scripts
-│        └──format_GWAS.R
-│        └──harmonise_bim_hm3.R
-│        └──sum_scores_p12.R
-│        └──prs_metabolite_associations_p12.R
+│        └──format_GWAS.R #extract columns and format for PRS-CS, no filtering.
+│        └──harmonise_bim_hm3.R #extract variants that are in hm3, orient alleles in standardised way to hm3
+│        └──sum_scores_p12.R #combine scores from per chr scoring files 
+│        └──prs_metabolite_associations_p12.R #test association of metabolite ~ PRS + covars
 ├──PRScs/ #PRScs scripts cloned from https://github.com/getian107/PRScs
 │        └──PRScs.py
 ├──config #config files
